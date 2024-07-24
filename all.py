@@ -50,10 +50,10 @@ class MM_DIT(nn.Module):                                #  X,Y,C=[batch,token,ch
         return x * (1 + scale) + shift
 
     def RMS_norm(self,x,eps=1e-6):
-        # 计算通道（channels）维度上的均值和均方根
+        
         mean = x.mean(dim=(1, 2), keepdim=True)
         rms = (x ** 2).mean(dim=(1, 2), keepdim=True).sqrt() + eps
-        # 归一化
+       
         normalized_x = (x - mean) / rms
         return normalized_x
 
@@ -246,10 +246,10 @@ class CompositeBlock(nn.Module):   #modulation+linear+unpatching[1,156,4096]-->[
 
 
         self.modulation = ModulationBlock(4096, modulation_dim)  #[B,T,C]=[1,233,4096]
-        self.up_patching = UpPatchBlock(up_patch_dim, 3, scale_factor=16)  # 根据需要调整上采样的尺寸,64*16=1024
+        self.up_patching = UpPatchBlock(up_patch_dim, 3, scale_factor=16)  # 64*16=1024
 
     def forward(self, input1, input2):
-        # 调制和线性变换
+     
         modulated_input = self.modulation(input1,input2)  #[1,233,4096]
         batch_size, channel, features = modulated_input.shape
 
@@ -265,7 +265,7 @@ class CompositeBlock(nn.Module):   #modulation+linear+unpatching[1,156,4096]-->[
         return output
 
 
-#  ---------------------------------------------数据选择-------------------------------------------------------------
+#  ---------------------------------------------data select-------------------------------------------------------------
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 channel = 4096
 token = 77
@@ -278,7 +278,7 @@ condition = "photo"   #MMDIT,input are photo or text(left and right parameter)
 epoch = 3
 t_step = 4
 
-#输入的张量
+#input
 y_input = torch.randn(batch_size, token, channel).to(device)    #[1,77,4096]
 x_input = torch.randn(batch_size, in_channels, img_size, img_size).to(device)  #[batchsize:1,in_channel:3,1024,1024]from latent photo
 c_input = torch.randn(batch_size,token*2,channel).to(device)  #[1,154,4096] from CLIP
@@ -296,8 +296,8 @@ model_DIT = MM_DIT(channel,mlp_ratio=4).cuda()            #mlp_ration=64*D
 class AllModel(nn.Module):
     def __init__(self,modelX,modelY,modelC,composite_block,model_DIT):
         super(AllModel, self).__init__()
-        # 初始化你的模型组件
-        self.modelY = modelY  # 替换为实际的类名
+       
+        self.modelY = modelY  
         self.modelX = modelX
         self.modelC = modelC
         self.model_DIT = model_DIT
