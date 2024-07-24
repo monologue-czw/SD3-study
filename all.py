@@ -5,6 +5,8 @@ import math
 import random
 import sympy as sp
 
+#The theoretical parameters are in the comments(⭐).
+
 class MM_DIT(nn.Module):                                #  X,Y,C=[batch,token,channel]
     def __init__(self,channel,mlp_ratio,num_head=8):
         super(MM_DIT,self).__init__()
